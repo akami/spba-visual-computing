@@ -1,0 +1,6 @@
+[submodule "Barbershop"]
+	path = Barbershop
+	url = https://github.com/ZPdesu/Barbershop.git
+[submodule "HairMapper"]
+	path = HairMapper
+	url = https://github.com/oneThousand1000/HairMapper.git
