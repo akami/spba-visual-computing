@@ -4,3 +4,6 @@
 [submodule "HairMapper"]
 	path = HairMapper
 	url = https://github.com/oneThousand1000/HairMapper.git
+[submodule "stylegan3"]
+	path = stylegan3
+	url = https://github.com/akami/stylegan3.git
