@@ -2,10 +2,13 @@ from util import util
 import os
 import argparse
 
-
+model_dic = {"ffhq": "https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-t-ffhq-1024x1024.pkl"}
 def main():
     # parse arguments
     args = parse_args()
+
+    # load pretrained model
+    util.load_pretrained_model(model_dic["ffhq"], "ffhq")
 
     # get image paths
     img_path1 = os.path.join(args.input_dir, args.img1)
