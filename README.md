@@ -1,1 +1,1 @@
-# A GAN-based system for creating photorealistic 2D human avatars with changeable hair
+# Hair Editing with Generative Adversarial Networks
