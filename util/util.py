@@ -1,9 +1,6 @@
-import sys
-
 import PIL.Image
 import requests
 import os
-import shutil
 
 
 def load_image(img_path, downsample=True):
