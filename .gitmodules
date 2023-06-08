@@ -1,9 +1,9 @@
-[submodule "Barbershop"]
-	path = Barbershop
-	url = https://github.com/ZPdesu/Barbershop.git
-[submodule "HairMapper"]
-	path = HairMapper
-	url = https://github.com/oneThousand1000/HairMapper.git
-[submodule "stylegan3"]
-	path = stylegan3
+[submodule "references/HairMapper"]
+	path = references/HairMapper
+	url = https://github.com/akami/HairMapper.git
+[submodule "references/Barbershop"]
+	path = references/Barbershop
+	url = https://github.com/akami/Barbershop.git
+[submodule "references/StyleGAN3"]
+	path = references/StyleGAN3
 	url = https://github.com/akami/stylegan3.git

@@ -1,26 +1,36 @@
-from util import util
+from src.util import util
 import os
 import argparse
+from src.preprocessing import align
 
-model_dic = {"ffhq": "https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-t-ffhq-1024x1024.pkl"}
+model_dic = {"ffhq": "https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-t"
+                     "-ffhq-1024x1024.pkl",
+             "dlib_shape_predictor": "http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2"}
+
+
 def main():
     # parse arguments
     args = parse_args()
 
     # load pretrained model
-    util.load_pretrained_model(model_dic["ffhq"], "ffhq")
+    util.load_pretrained_model(model_dic["ffhq"], "ffhq", "pkl")
+    util.load_pretrained_model(model_dic["dlib_shape_predictor"], "dlib_shape_predictor", "dat.bz2")
 
     # get image paths
     img_path1 = os.path.join(args.input_dir, args.img1)
     img_path2 = os.path.join(args.input_dir, args.img2)
 
     # load and downsample images
-    img1_downsampled = util.load_image(img_path1, downsample=True)
-    img2_downsampled = util.load_image(img_path2, downsample=True)
+    img1 = util.load_image(img_path1, downsample=True)
+    img2 = util.load_image(img_path2, downsample=False)
+
+    # align in the wild image
+    aligned_image = align.align(img_path2, 1024)
 
     # save downsampled images in output folder
-    util.save_image(img1_downsampled, "img1_downsampled", args.output_dir)
-    util.save_image(img2_downsampled, "img2_downsampled", args.output_dir)
+    util.save_image(img1, "img1", args.output_dir)
+    util.save_image(img2, "img2", args.output_dir)
+    util.save_image(aligned_image, "img2_aligned", args.output_dir)
 
 
 def parse_args():
