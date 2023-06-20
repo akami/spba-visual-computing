@@ -3,26 +3,46 @@ import PIL
 import PIL.Image
 import scipy
 import dlib
-import os
 
 """
-This methods align in-the-wild pictures with the FFHQ dataset.
+The following methods borrow heavily from Barbershop reference: Barbershop/utils/shape_predictor.py:
 
+############# COPY START #############
+brief: face alignment with FFHQ method (https://github.com/NVlabs/ffhq-dataset)
+author: lzhbrian (https://lzhbrian.me)
+date: 2020.1.5
+note: code is heavily borrowed from
+    https://github.com/NVlabs/ffhq-dataset
+    http://dlib.net/face_landmark_detection.py.html
+
+requirements:
+    apt install cmake
+    conda install Pillow numpy scipy
+    pip install dlib
+    # download face landmark model from:
+    # http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
+############# COPY END #############
 """
-
 
 def align(file_path, output_size=1024):
     """
-    aligns face according to ffhq data
+    This method aligns in-the-wild pictures according to the FFHQ dataset. The FFHQ dataset was used to train the
+    StyleGAN3 network, hence it is necessary for input images to be aligned the right way in order for the network
+    to recognize facial features and to minimize artifacts due to misalignment.
+
     :param img: RGB image
-    :param output_size:
-    :return:
+    :param output_size: image size
+    :return: image translated into FFHQ format
     """
+
+    # set up predictor model
     predictor = dlib.shape_predictor("./pretrained_models/dlib_shape_predictor.dat")
     img = dlib.load_rgb_image(file_path)
     lm = get_landmark(img, predictor)
 
-    """ Copied from Barbershop/utils/shape_predictor.py"""
+    ############# COPY START #############
+
+    # Pre-define landmark data.
     lm_chin = lm[0: 17]  # left-right
     lm_eyebrow_left = lm[17: 22]  # left-right
     lm_eyebrow_right = lm[22: 27]  # left-right
@@ -55,8 +75,12 @@ def align(file_path, output_size=1024):
     # read image
     img = PIL.Image.open(file_path)
 
+    ############# COPY END #############
+
     transform_size = 4096
     enable_padding = True
+
+    ############# COPY START #############
 
     # Shrink.
     shrink = int(np.floor(qsize / output_size * 0.5))
@@ -100,10 +124,18 @@ def align(file_path, output_size=1024):
     if output_size < transform_size:
         img = img.resize((output_size, output_size), PIL.Image.ANTIALIAS)
 
+    ############# COPY END #############
+
     return img
 
+
 def get_landmark(img, predictor):
-    """ detects landmarks in a face """
+    """
+    This method detects landmarks in a face using the dlib shape predictor.
+    :param img: RGB image
+    :param predictor: dlib predictor
+    :return: array of facial landmarks, shape=(68, 2)
+    """
     detector = dlib.get_frontal_face_detector()
     detected = detector(img, 1)
 
