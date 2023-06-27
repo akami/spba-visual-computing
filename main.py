@@ -1,7 +1,7 @@
 from src.util import util
 import os
 import argparse
-from src.preprocessing import align
+from src.preprocessing.Preprocessing import Preprocessing
 
 model_dic = {"ffhq": "https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-t"
                      "-ffhq-1024x1024.pkl",
@@ -20,17 +20,21 @@ def main():
     img_path1 = os.path.join(args.input_dir, args.img1)
     img_path2 = os.path.join(args.input_dir, args.img2)
 
-    # load and downsample images
-    img1 = util.load_image(img_path1, downsample=True)
-    img2 = util.load_image(img_path2, downsample=False)
+    # load input images
+    img1 = util.load_image(img_path1)
+    img2 = util.load_image(img_path2)
 
-    # align in the wild image
-    aligned_image = align.align(img_path2, 1024)
+    # preprocess image
+    preprocessing = Preprocessing()
+    aligned_image_identity = preprocessing.preprocess(img_path1, in_the_wild=False)
+    aligned_image_hair = preprocessing.preprocess(img_path2, in_the_wild=True)
 
-    # save downsampled images in output folder
+
+    # save images images in output folder
     util.save_image(img1, "img1", args.output_dir)
     util.save_image(img2, "img2", args.output_dir)
-    util.save_image(aligned_image, "img2_aligned", args.output_dir)
+    util.save_image(aligned_image_identity, "img1_preprocessed", args.output_dir)
+    util.save_image(aligned_image_hair, "img2_preprocessed", args.output_dir)
 
 
 def parse_args():
