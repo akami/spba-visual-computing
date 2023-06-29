@@ -6,7 +6,7 @@ import os
 from bz2 import decompress
 
 
-def load_image(img_path, downsample=True):
+def load_image(img_path, downsample=False):
     """loads image from path"""
     # get rgb image from image path
     img = PIL.Image.open(img_path).convert("RGB")
