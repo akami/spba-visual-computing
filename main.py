@@ -1,20 +1,16 @@
 from src.util import util
 import os
 import argparse
+from src.util.model_loader import ModelLoader
 from src.preprocessing.Preprocessing import Preprocessing
-
-model_dic = {"ffhq": "https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/stylegan3-t"
-                     "-ffhq-1024x1024.pkl",
-             "dlib_shape_predictor": "http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2"}
-
 
 def main():
     # parse arguments
     args = parse_args()
 
-    # load pretrained model
-    util.load_pretrained_model(model_dic["ffhq"], "ffhq", "pkl")
-    util.load_pretrained_model(model_dic["dlib_shape_predictor"], "dlib_shape_predictor", "dat.bz2")
+    # load pretrained models
+    model_loader = ModelLoader()
+    model_loader.load_models()
 
     # get image paths
     img_path1 = os.path.join(args.input_dir, args.img1)
