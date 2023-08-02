@@ -5,6 +5,7 @@ import os
 import argparse
 from util.model_loader import ModelLoader
 
+
 def main():
     # parse arguments
     args = parse_args()
@@ -50,6 +51,7 @@ def main():
     # combine images
     # TODO implement
     # res_img_path = hair_editor.run(face_img_path, hair_img_path)
+
 
 def parse_args():
     """parses command line arguments"""

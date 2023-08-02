@@ -10,7 +10,7 @@ from models.model import Model
 
 
 """
-The following methods borrow heavily from Barbershop reference: Barbershop/utils/shape_predictor.py:
+The following methods borrow heavily from Barbershop reference: references/Barbershop/utils/shape_predictor.py:
 
 ############# COPY START #############
 brief: face alignment with FFHQ method (https://github.com/NVlabs/ffhq-dataset)
@@ -31,6 +31,15 @@ requirements:
 
 
 class FfhqAligner(Model):
+    """
+    This class represents the preprocessing-step in which in-the-wild pictures are aligned according to the FFHQ dataset.
+    The FFHQ dataset was used to train the StyleGAN model. So aligning pictures that do not come from this dataset is
+    crucial in making sure that the resulting picture looks realistic, i.e. does not show unwanted artifacts.
+    In particular, the portrait picture is cropped and centered around the face. We use dlib landmark detection to align
+    and match the position of facial landmarks according to FFHQ.
+    Only use this model as a preprocessing-step if your input portrait picture is in fact in-the-wild. Otherwise,
+    processing already aligned pictures will result in blurring and/or unwanted artifacts.
+    """
     def __init__(self, loader, model_dir, tmp_dir):
         super().__init__(loader, model_dir, tmp_dir)
 
@@ -58,11 +67,10 @@ class FfhqAligner(Model):
     def _setup(self):
         super()._setup()
 
-        # TODO use path from pretrained models dict
         predictor_path = "./pretrained_models/dlib_shape_predictor.dat"
 
         if os.path.exists(predictor_path):
-            self.predictor = dlib.shape_predictor("./pretrained_models/dlib_shape_predictor.dat")
+            self.predictor = dlib.shape_predictor(predictor_path)
 
     def _run(self, *img_paths):
         img_path = img_paths[0]
@@ -85,12 +93,11 @@ class FfhqAligner(Model):
 
     def _align_face(self, lm, img, output_size=1024):
         """
-        This method aligns in-the-wild pictures according to the FFHQ dataset. The FFHQ dataset was used to train the
-        StyleGAN3 network, hence it is necessary for input images to be aligned the right way in order for the network
+        This method aligns in-the-wild pictures according to the FFHQ dataset in order for the network
         to recognize facial features and to minimize artifacts due to misalignment.
 
         :param lm: image landmarks
-        :param file_path: RGB image file path
+        :param img: RGB image file path
         :param output_size: image size
         :return: image translated into FFHQ format
         """
@@ -184,7 +191,6 @@ class FfhqAligner(Model):
         """
         This method detects landmarks in a face using the dlib shape predictor.
         :param img: input image
-        :param predictor: dlib predictor
         :return: array of facial landmarks, shape=(68, 2)
         """
 

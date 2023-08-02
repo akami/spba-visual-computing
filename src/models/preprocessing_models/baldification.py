@@ -14,11 +14,16 @@ from references.HairMapper.encoder4editing.models.psp import pSp
 from references.HairMapper.styleGAN2_ada_model.stylegan2_ada_generator import StyleGAN2adaGenerator
 from references.HairMapper.mapper.networks.level_mapper import LevelMapper
 from references.HairMapper.classifier.src.feature_extractor.hair_mask_extractor import get_hair_mask, get_parsingNet
-from references.HairMapper.diffuse.inverter_remove_hair import InverterRemoveHair
 
 
-# TODO documentation
 class Baldification(Model):
+    """
+    This class represents the HairMapper model that is used as a preprocessing-step. It should be used to process the
+    input face identity image in order to minimize the appearance of artifacts around the hair area.
+    By eliminating the hair in the face identity image, we get a bald image.
+    Note that, in order to get a realistic result, the image needs to be aligned according to the FFHQ dataset prior.
+    """
+
     def __init__(self, loader, model_dir, tmp_dir):
         super().__init__(loader, model_dir, tmp_dir)
 
@@ -111,7 +116,6 @@ class Baldification(Model):
         return img_name
 
     def _encode(self, img_path):
-
         # pre-define image transforms
         img_transforms = transforms.Compose([
             transforms.Resize((256, 256)),
@@ -148,6 +152,16 @@ class Baldification(Model):
         return latents
 
     def _hair_mapper(self, img_path):
+        """
+        This method runs the HairMapper model according to the provided Jupyter Notebook in references/HairMapper.
+        The input image is first translated into latent code using an encoder. The latent code is then fed through the
+        HairMapper network which uses StyleGAN2 as a generator. The result is a baldified image with the same face
+        identity as the input image.
+
+        :param img_path: input image path
+        :return: bald image
+        """
+
         # run encoder
         latent_code = self._encode(img_path)
 
@@ -176,17 +190,6 @@ class Baldification(Model):
         # set up parsing network
         parsing_net_path = self._get_pretrained_model_path('face_parsing')
         parsing_net = get_parsingNet(save_pth=parsing_net_path)
-
-        # set up inverter
-        inverter = InverterRemoveHair(
-            model_name,
-            Generator=model,
-            learning_rate=0.01,
-            reconstruction_loss_weight=1.0,
-            perceptual_loss_weight=5e-5,
-            truncation_psi=1.0,
-            logger=None
-        )
 
         # set up latent code as input for hair mapper
         latent_code_origin = np.reshape(latent_code, (1, 18, 512))
