@@ -65,6 +65,13 @@ class FfhqAligner(Model):
         }
 
     def _setup(self):
+        """
+        Implementation of the private setup method in model base class.
+        Loads models as per default.
+        Initializes the dlib shape predictor needed for landmark detection.
+
+        :return: void
+        """
         super()._setup()
 
         predictor_path = "./pretrained_models/dlib_shape_predictor.dat"
@@ -73,6 +80,14 @@ class FfhqAligner(Model):
             self.predictor = dlib.shape_predictor(predictor_path)
 
     def _run(self, *img_paths):
+        """
+        Implementation of the private run method of the base class.
+        Runs the dlib model to get the landmarks, uses these to align the face according to FFHQ and saves the image
+        using the PIL library.
+
+        :param img_paths: input image path(s)
+        :return: result image path
+        """
         img_path = img_paths[0]
 
         # get landmarks
