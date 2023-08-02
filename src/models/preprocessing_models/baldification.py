@@ -21,7 +21,7 @@ class Baldification(Model):
     This class represents the HairMapper model that is used as a preprocessing-step. It should be used to process the
     input face identity image in order to minimize the appearance of artifacts around the hair area.
     By eliminating the hair in the face identity image, we get a bald image.
-    Note that, in order to get a realistic result, the image needs to be aligned according to the FFHQ dataset prior.
+    Note that, in order to get a realistic result, the image needs to be aligned according to the FFHQ dataset.
     """
 
     def __init__(self, loader, model_dir, tmp_dir):
@@ -91,6 +91,13 @@ class Baldification(Model):
         }
 
     def _run(self, *img_paths):
+        """
+        Implementation of the private run method of the base class. Runs the hair mapper model and saves the image using
+        cv2.
+
+        :param img_paths: input image path(s)
+        :return: result image path
+        """
         img_path = img_paths[0]
 
         ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -106,16 +113,29 @@ class Baldification(Model):
 
         return res_img_path
 
-    # TODO restructure
     def _save_result(self, img_name, res):
-        img_name = img_name.replace(".png", f"_{self._get_img_name_suffix()}.png")
+        """
+        Saves the result using the cv2 library.
 
-        res_path = os.path.join(self.output_dir, img_name)
+        :param img_name: image name
+        :param res: result image
+        :return: result image name
+        """
+        img_name = img_name.replace(".png", f"_{self._get_img_suffix()}.png")
+
+        res_path = os.path.join(self._tmp_dir, img_name)
         cv2.imwrite(res_path, res)
 
         return img_name
 
     def _encode(self, img_path):
+        """
+        This method translates image data to latent code data using the FFHQ encoder.
+
+        :param img_path: image path
+        :return: image in latent code
+        """
+
         # pre-define image transforms
         img_transforms = transforms.Compose([
             transforms.Resize((256, 256)),
@@ -148,8 +168,15 @@ class Baldification(Model):
         return latent
 
     def _run_on_batch(self, inputs, net):
-        latents = net(inputs.to("cuda").float(), randomize_noise=False, return_latents=True)
-        return latents
+        """
+        Feeds input into a network in batches.
+
+        :param inputs: input file(s)
+        :param net: network
+        :return: result after feeding input into network
+        """
+        result = net(inputs.to("cuda").float(), randomize_noise=False, return_latents=True)
+        return result
 
     def _hair_mapper(self, img_path):
         """
@@ -199,8 +226,7 @@ class Baldification(Model):
         edited_latent_codes = latent_code_origin
         edited_latent_codes[:, :8, :] += alpha * mapper(mapper_input_tensor).to('cpu').detach().numpy()
 
-        origin_img = cv2.imread(img_path)
-
+        # set up model for style mixing
         outputs = model.easy_style_mixing(
             latent_codes=edited_latent_codes,
             style_range=range(7, 18),
@@ -209,8 +235,13 @@ class Baldification(Model):
             **kwargs
         )
 
+        # edit image using style mixing model
         edited_img = outputs['image'][0][:, :, ::-1]
 
+        # get origin image
+        origin_img = cv2.imread(img_path)
+
+        # get hair mask and edit
         hair_mask = get_hair_mask(img_path=origin_img, net=parsing_net, include_hat=True, include_ear=True)
 
         mask_dilate = cv2.dilate(hair_mask, kernel=np.ones((50, 50), np.uint8))
