@@ -1,5 +1,4 @@
 import os
-import sys
 import torch
 import torchvision.transforms as transforms
 import PIL.Image
@@ -10,10 +9,10 @@ import cv2
 
 from models.model import Model
 
-from references.HairMapper.encoder4editing.models.psp import pSp
-from references.HairMapper.styleGAN2_ada_model.stylegan2_ada_generator import StyleGAN2adaGenerator
-from references.HairMapper.mapper.networks.level_mapper import LevelMapper
-from references.HairMapper.classifier.src.feature_extractor.hair_mask_extractor import get_hair_mask, get_parsingNet
+from models.baldification.models.HairMapper.encoder4editing.models.psp import pSp
+from models.baldification.models.HairMapper.styleGAN2_ada_model.stylegan2_ada_generator import StyleGAN2adaGenerator
+from models.baldification.models.HairMapper.mapper.networks.level_mapper import LevelMapper
+from models.baldification.models.HairMapper.classifier.src.feature_extractor.hair_mask_extractor import get_hair_mask, get_parsingNet
 
 
 class Baldification(Model):

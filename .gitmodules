@@ -1,9 +1,9 @@
-[submodule "references/HairMapper"]
-	path = references/HairMapper
+[submodule "src/models/baldification/models/HairMapper"]
+	path = src/models/baldification/models/HairMapper
 	url = https://github.com/akami/HairMapper.git
 [submodule "references/Barbershop"]
 	path = references/Barbershop
 	url = https://github.com/akami/Barbershop.git
-[submodule "references/StyleGAN3"]
-	path = references/StyleGAN3
+[submodule "src/models/barbershop3/models/stylegan3"]
+	path = src/models/barbershop3/models/stylegan3
 	url = https://github.com/akami/stylegan3.git

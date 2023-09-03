@@ -74,6 +74,7 @@ class FfhqAligner(Model):
         """
         super()._setup()
 
+        # TODO fix
         predictor_path = "./pretrained_models/dlib_shape_predictor.dat"
 
         if os.path.exists(predictor_path):

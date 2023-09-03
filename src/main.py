@@ -1,9 +1,10 @@
-from models.hair_editor import HairEditor
-from models.preprocessing_models.baldification import Baldification
-from models.preprocessing_models.ffhq_aligner import FfhqAligner
 import os
 import argparse
-from util.model_loader import ModelLoader
+
+from utils.model_loader import ModelLoader
+from models.baldification.baldification import Baldification
+from models.barbershop3.barbershop3 import Barbershop3
+from models.ffhq_aligner.ffhq_aligner import FfhqAligner
 
 
 def main():
@@ -19,9 +20,9 @@ def main():
     os.makedirs(tmp_dir, exist_ok=True)
 
     # model paths
-    aligner_dir = root
-    baldification_dir = os.path.join(root, "references/HairMapper")
-    hair_editor = root
+    aligner_dir = os.path.join(root, "models/ffhq_aligner")
+    baldification_dir = os.path.join(root, "models/baldification/models/HairMapper")
+    barbershop3_dir = os.path.join(root, "models/barbershop3")
 
     # image paths
     face_img_path = args.face_img if os.path.isabs(args.face_img) else os.path.join(root, args.face_img)
@@ -36,7 +37,7 @@ def main():
     # defining models
     aligner = FfhqAligner(loader, aligner_dir, tmp_dir)
     baldification = Baldification(loader, baldification_dir, tmp_dir)
-    hair_editor = HairEditor(loader, hair_editor, tmp_dir)
+    barbershop3 = Barbershop3(loader, barbershop3_dir, tmp_dir)
 
     # preprocess face image
     if args.face_align:
@@ -46,11 +47,11 @@ def main():
     if args.hair_align:
         hair_img_path = aligner.run(hair_img_path)
 
-    hair_img_path = baldification.run(hair_img_path)
+    # remove hair from identity image
+    face_img_path = baldification.run(face_img_path)
 
     # combine images
-    # TODO implement
-    # res_img_path = hair_editor.run(face_img_path, hair_img_path)
+    res_img_path = barbershop3.run(face_img_path, hair_img_path)
 
 
 def parse_args():
